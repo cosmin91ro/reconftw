@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  scan:
+    image: cosmin91ro/reconftw
+    build: .
+    volumes:
+      - $PWD/../pentest/configs/reconftw.cfg:/root/Tools/reconftw/reconftw.cfg
+      - $PWD/../pentest/configs/amass.config.ini:/root/.config/amass/config.ini
+      - $PWD/../pentest/configs/github_tokens.txt:/root/Tools/.github_tokens
+      - $PWD/../pentest/configs/notify/provider-config.yaml:/root/.config/notify/provider-config.yaml
+      - $PWD/../pentest/configs/subfinder/config.yaml:/root/.config/subfinder/config.yaml
+      - $PWD/../pentest/recon/out:/root/Tools/reconftw/Recon
+    environment:
+      - COLLAB_SERVER=${COLLAB_SERVER:?COLLAB_SERVER not defined}
+      - XSS_SERVER=${XSS_SERVER:?XSS_SERVER not defined}
+      - SHODAN_API_KEY=${SHODAN_API_KEY:?SHODAN_API_KEY not defined}
+
+
+networks: 
+  default: 
+    external: 
+      name: pentestnet 

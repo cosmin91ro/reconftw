@@ -1,12 +1,6 @@
-# syntax=docker/dockerfile:1.3-labs
-
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# syntax=docker/dockerfile:1.3.0-labs
 
 ## You can change these variables
-ARG COLLAB_SERVER="XXXXXXXXXX"
-ARG XSS_SERVER="XXXXXXXXXXX"
-ARG SHODAN_API_KEY="XXXXXXXXXXXXXX"
-
 ARG LANG=en_US.UTF-8
 ARG LANGUAGE=en_US
 
@@ -18,21 +12,17 @@ FROM kalilinux/kali-rolling:latest AS base
 
 LABEL org.label-schema.name='reconftw'
 LABEL org.label-schema.description='A simple script for full recon'
-LABEL org.label-schema.usage='https://github.com/six2dez/reconftw'
-LABEL org.label-schema.url='https://github.com/six2dez/reconftw'
-LABEL org.label-schema.docker.cmd.devel='docker run --rm -ti six2dez/reconftw'
-LABEL MAINTAINER="six2dez"
-
-ARG COLLAB_SERVER
-ARG XSS_SERVER
-ARG SHODAN_API_KEY
-
-ARG LANG
-ARG LANGUAGE
+LABEL org.label-schema.usage='https://github.com/cosmin91ro/reconftw'
+LABEL org.label-schema.url='https://github.com/cosmin91ro/reconftw'
+LABEL org.label-schema.docker.cmd.devel='docker run --rm -ti cosmin91ro/reconftw'
+LABEL MAINTAINER="cwave"
 
 ENV COLLAB_SERVER=$COLLAB_SERVER
 ENV XSS_SERVER=$XSS_SERVER
 ENV SHODAN_API_KEY=$SHODAN_API_KEY
+
+ARG LANG
+ARG LANGUAGE
 
 ENV LANG=$LANG
 ENV LANGUAGE=$LANGUAGE
@@ -66,7 +56,7 @@ update-locale LANG=${LANG}
 ############> Install reconFTW <############
 mkdir -p /root/Tools
 cd /root/Tools
-git clone https://github.com/six2dez/reconftw.git
+git clone https://github.com/cosmin91ro/reconftw.git
 cd reconftw
 ./install.sh
 ############> Clean up <############
@@ -84,11 +74,6 @@ find /var/log -type f -delete
 rm -rf /root/.cache
 rm -rf /root/go
 eot
-
-COPY amass_config.ini /root/.config/amass/config.ini
-COPY github_tokens.txt /root/Tools/.github_tokens
-COPY notify.conf /root/.config/notify/notify.conf
-COPY subfinder_config.yaml /root/.config/subfinder/config.yaml
 
 WORKDIR /root/Tools/reconftw
 ENTRYPOINT [ "bash", "reconftw.sh" ]
