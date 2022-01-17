@@ -17,10 +17,6 @@ LABEL org.label-schema.url='https://github.com/cosmin91ro/reconftw'
 LABEL org.label-schema.docker.cmd.devel='docker run --rm -ti cosmin91ro/reconftw'
 LABEL MAINTAINER="cwave"
 
-ENV COLLAB_SERVER=$COLLAB_SERVER
-ENV XSS_SERVER=$XSS_SERVER
-ENV SHODAN_API_KEY=$SHODAN_API_KEY
-
 ARG LANG
 ARG LANGUAGE
 
@@ -74,6 +70,9 @@ find /var/log -type f -delete
 rm -rf /root/.cache
 rm -rf /root/go
 eot
+
+ARG SHODAN_API_KEY
+RUN shodan init $SHODAN_API_KEY
 
 WORKDIR /root/Tools/reconftw
 ENTRYPOINT [ "bash", "reconftw.sh" ]
