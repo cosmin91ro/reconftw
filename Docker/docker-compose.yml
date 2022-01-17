@@ -3,19 +3,48 @@ version: '3.8'
 services:
   scan:
     image: cosmin91ro/reconftw
-    build: .
+    build:
+      context: .
+      args:
+        SHODAN_API_KEY: ${SHODAN_API_KEY}
+    hostname: scan
     volumes:
-      - $PWD/../pentest/configs/reconftw.cfg:/root/Tools/reconftw/reconftw.cfg
-      - $PWD/../pentest/configs/amass.config.ini:/root/.config/amass/config.ini
-      - $PWD/../pentest/configs/github_tokens.txt:/root/Tools/.github_tokens
-      - $PWD/../pentest/configs/notify/provider-config.yaml:/root/.config/notify/provider-config.yaml
-      - $PWD/../pentest/configs/subfinder/config.yaml:/root/.config/subfinder/config.yaml
-      - $PWD/../pentest/recon/out:/root/Tools/reconftw/Recon
+      - $PWD/../../pentest/configs/reconftw/reconftw.cfg:/root/Tools/reconftw/reconftw.cfg
+      - $PWD/../../pentest/configs/amass.config.ini:/root/.config/amass/config.ini
+      - $PWD/../../pentest/configs/subfinder/config.yaml:/root/.config/subfinder/config.yaml
+      - $PWD/../../pentest/configs/github_tokens.txt:/root/Tools/.github_tokens
+      - $PWD/../../pentest/configs/notify/provider-config.yaml:/root/.config/notify/provider-config.yaml
+      - $PWD/../../pentest/configs/h8mail_config.ini:/root/Tools/h8mail_config.ini
+      - $PWD/../../pentest/configs/bbrf-client/.bbrf/config.json:/root/.bbrf/config.json
+      - $PWD/../../pentest/recon/out:/root/Tools/reconftw/Recon
     environment:
       - COLLAB_SERVER=${COLLAB_SERVER:?COLLAB_SERVER not defined}
       - XSS_SERVER=${XSS_SERVER:?XSS_SERVER not defined}
       - SHODAN_API_KEY=${SHODAN_API_KEY:?SHODAN_API_KEY not defined}
+    depends_on:
+      - bbrf-server
 
+  bbrf-server:
+    hostname: bbrf-server
+    image: honoki/bbrf-server
+    environment:
+      - COUCHDB_USER=cwave
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:?COUCHDB_PASSWORD not defined}
+      - BBRF_PASSWORD=${BBRF_PASSWORD:?BBRF_PASSWORD not defined} 
+    volumes:
+      - ./../../bbrf-server/data/couchdb/1:/opt/couchdb/data
+
+  proxy:
+    image: nginx
+    hostname: proxy
+    ports:
+     - "8443:443"
+    volumes:
+      - ./../../bbrf-server/proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./../../bbrf-server/proxy/docker-entrypoint.d/:/docker-entrypoint.d/
+      - ./../../bbrf-server/proxy/keys/:/etc/nginx/keys/
+    depends_on:
+      - bbrf-server
 
 networks: 
   default: 
