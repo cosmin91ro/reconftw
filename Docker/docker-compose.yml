@@ -22,13 +22,13 @@ services:
       - XSS_SERVER=${XSS_SERVER:?XSS_SERVER not defined}
       - SHODAN_API_KEY=${SHODAN_API_KEY:?SHODAN_API_KEY not defined}
     depends_on:
-      - bbrf-server
+      - proxy
 
-  bbrf-server:
-    hostname: bbrf-server
+  couchdb:
+    hostname: couchdb
     image: honoki/bbrf-server
     environment:
-      - COUCHDB_USER=cwave
+      - COUCHDB_USER=${COUCHDB_USER:?COUCHDB_USER not defined}
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:?COUCHDB_PASSWORD not defined}
       - BBRF_PASSWORD=${BBRF_PASSWORD:?BBRF_PASSWORD not defined} 
     volumes:
@@ -44,9 +44,8 @@ services:
       - ./../../bbrf-server/proxy/docker-entrypoint.d/:/docker-entrypoint.d/
       - ./../../bbrf-server/proxy/keys/:/etc/nginx/keys/
     depends_on:
-      - bbrf-server
+      - couchdb
 
 networks: 
   default: 
-    external: 
-      name: pentestnet 
+    name: pentestnet 
